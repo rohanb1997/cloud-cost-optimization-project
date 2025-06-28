@@ -56,7 +56,7 @@ const instanceTypeOptions = ref({
 
 const getCostEstimate = async () => {
     try {
-        const response = await axios.post('http://localhost:5000/api/estimate', reqBody.value)
+        const response = await axios.post('https://cloud-cost-optimization-project.onrender.com', reqBody.value)
         const result = response.data
         costResult.value = result
     } catch (error) {
