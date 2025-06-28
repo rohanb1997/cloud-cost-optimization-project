@@ -35,39 +35,39 @@ const dummyPricing = {
 
 // Estimate cost endpoint
 app.post('/api/estimate', (req, res) => {
-  const { provider, instanceType, hours, storageType, storageGB, bandwidthGB } = req.body
+  const body = req.body && Object.keys(req.body).length ? req.body : req.query;
+
+  const { provider, instanceType, hours, storageType, storageGB, bandwidthGB } = body;
 
   try {
     if (!dummyPricing[provider]) {
-      return res.status(400).json({ error: 'Invalid provider' })
+      return res.status(400).json({ error: 'Invalid provider' });
     }
 
-    const computeRate = parseFloat(dummyPricing[provider].computeRates[instanceType]) || 0.025
-    const storageRate = parseFloat(dummyPricing[provider].storage[storageType]) || 0.1
-    const bandwidthRate = parseFloat(dummyPricing[provider].bandwidth) || 0.1
+    const computeRate = parseFloat(dummyPricing[provider].computeRates[instanceType]) || 0.025;
+    const storageRate = parseFloat(dummyPricing[provider].storage[storageType]) || 0.1;
+    const bandwidthRate = parseFloat(dummyPricing[provider].bandwidth) || 0.1;
 
-    const computeHours = Number.isFinite(Number(hours)) ? Number(hours) : 0
-    const storageAmount = Number.isFinite(Number(storageGB)) ? Number(storageGB) : 0
-    const bandwidthAmount = Number.isFinite(Number(bandwidthGB)) ? Number(bandwidthGB) : 0
+    const computeHours = parseFloat(hours) || 0;
+    const storageAmount = parseFloat(storageGB) || 0;
+    const bandwidthAmount = parseFloat(bandwidthGB) || 0;
 
-    const computeCost = computeHours * computeRate
-    const storageCost = storageAmount * storageRate
-    const bandwidthCost = bandwidthAmount * bandwidthRate
+    const computeCost = computeHours * computeRate;
+    const storageCost = storageAmount * storageRate;
+    const bandwidthCost = bandwidthAmount * bandwidthRate;
 
-    const totalCost = (computeCost + storageCost + bandwidthCost).toFixed(2)
+    const totalCost = (computeCost + storageCost + bandwidthCost).toFixed(2);
 
-    const suggestions = []
+    const suggestions = [];
 
     if (computeHours >= 600) {
-      suggestions.push('Consider using Reserved Instances or Savings Plans for long-running workloads.')
+      suggestions.push('Consider using Reserved Instances or Savings Plans for long-running workloads.');
     }
-
     if (bandwidthAmount >= 100) {
-      suggestions.push('Consider using a CDN or checking for regions with lower outbound data costs.')
+      suggestions.push('Consider using a CDN or checking for regions with lower outbound data costs.');
     }
-
     if (storageRate >= 0.1 && storageAmount > 50) {
-      suggestions.push('Switching from SSD to HDD may reduce storage costs.')
+      suggestions.push('Switching from SSD to HDD may reduce storage costs.');
     }
 
     res.json({
@@ -78,14 +78,14 @@ app.post('/api/estimate', (req, res) => {
         bandwidth: bandwidthCost.toFixed(2)
       },
       suggestions
-    })
+    });
 
   } catch (err) {
-    console.error('Estimation error:', err.message)
-    res.status(500).json({ error: 'Estimation failed' })
+    console.error('Estimation error:', err.message);
+    res.status(500).json({ error: 'Estimation failed' });
   }
-})
+});
 
 app.listen(5000, () => {
-  console.log('Backend running at http://localhost:5000')
+  console.log('Backend running')
 })
