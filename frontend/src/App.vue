@@ -3,10 +3,10 @@
     <div class="text-center">
       <h1 class="text-white font-bold text-[24px] my-4">Cloud Cost Optimization</h1>
     </div>
-    <InputForm />
+    <CcopView />
   </div>
 </template>
 
 <script setup>
-import InputForm from './components/InputForm.vue';
+import CcopView from './components/CcopView.vue';
 </script>
